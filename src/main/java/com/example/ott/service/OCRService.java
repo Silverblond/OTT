@@ -5,15 +5,18 @@ import lombok.RequiredArgsConstructor;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OCRService {
 
-    public String performOCR(String imagePath) {
+    public List<String> performOCR(String imagePath) {
         try{
-            return TesseractUtil.extractText(imagePath);
+            String fullText = TesseractUtil.extractText(imagePath);
+            return TesseractUtil.splitLines(fullText);
         } catch (TesseractException e) {
-            throw new RuntimeException("OCR 처리 실패, e");
+            throw new RuntimeException("OCR 처리 실패", e);
         }
     }
 }

@@ -4,6 +4,9 @@ import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TesseractUtil {
 
@@ -29,5 +32,18 @@ public class TesseractUtil {
         tesseract.setLanguage("kor");
 
         return tesseract.doOCR(new File(imagePath));
+    }
+
+    /**
+     * OCR로 추출한 텍스트를 줄 단위로 나누고 전처리함
+     *
+     * @param rawText OCR로 추출된 원본 텍스트
+     * @return 정제된 각 줄 목록
+     */
+    public static List<String> splitLines(String rawText) {
+        return Arrays.stream(rawText.split("\\r?\\n"))
+                .map(String::trim)
+                .filter(line -> !line.isEmpty())
+                .collect(Collectors.toList());
     }
 }

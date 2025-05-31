@@ -2,9 +2,13 @@ package com.example.ott.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class OCRResultDto {
-    private String ocrText; //인식된 텍스트
+    private List<String> lines;
 }

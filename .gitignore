@@ -1,0 +1,17 @@
+# 빌드 산출물
+/build/
+.gradle/
+
+# IDE 설정
+.idea/
+*.iml
+
+# OS 자동 생성 파일
+.DS_Store
+Thumbs.db
+
+# 로그 파일
+*.log
+
+# 업로드된 파일(POST하면 알아서 생성되는 폴더)
+uploads/
