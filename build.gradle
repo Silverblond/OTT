@@ -38,6 +38,13 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+bootRun {
+	jvmArgs = [
+			"-Djava.library.path=/opt/homebrew/lib",
+			"-Djna.library.path=/opt/homebrew/lib"
+	]
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
