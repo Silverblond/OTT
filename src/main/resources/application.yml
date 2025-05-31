@@ -7,3 +7,10 @@ spring:
 
 ocr:
   save-dir: uploads
+
+translate:
+  default-lang: ko
+
+translation:
+  google:
+    api-key: [발급된 키]

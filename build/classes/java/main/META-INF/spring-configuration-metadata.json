@@ -1,12 +1,27 @@
 {
   "groups": [
     {
+      "name": "naver.papago",
+      "type": "com.example.ott.config.PapagoConfig",
+      "sourceType": "com.example.ott.config.PapagoConfig"
+    },
+    {
       "name": "ocr",
       "type": "com.example.ott.config.OCRConfig",
       "sourceType": "com.example.ott.config.OCRConfig"
     }
   ],
   "properties": [
+    {
+      "name": "naver.papago.client-id",
+      "type": "java.lang.String",
+      "sourceType": "com.example.ott.config.PapagoConfig"
+    },
+    {
+      "name": "naver.papago.client-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.example.ott.config.PapagoConfig"
+    },
     {
       "name": "ocr.save-dir",
       "type": "java.lang.String",
