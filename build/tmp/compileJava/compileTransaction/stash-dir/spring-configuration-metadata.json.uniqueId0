@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "name": "ocr",
+      "type": "com.example.ott.config.OCRConfig",
+      "sourceType": "com.example.ott.config.OCRConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "ocr.save-dir",
+      "type": "java.lang.String",
+      "sourceType": "com.example.ott.config.OCRConfig"
+    }
+  ],
+  "hints": []
+}
