@@ -11,6 +11,5 @@ ocr:
 translate:
   default-lang: ko
 
-translation:
-  google:
-    api-key: [발급된 키]
+google:
+  api-key: ${GOOGLE_API_KEY}

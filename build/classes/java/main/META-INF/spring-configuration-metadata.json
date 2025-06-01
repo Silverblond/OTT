@@ -1,9 +1,9 @@
 {
   "groups": [
     {
-      "name": "naver.papago",
-      "type": "com.example.ott.config.PapagoConfig",
-      "sourceType": "com.example.ott.config.PapagoConfig"
+      "name": "google",
+      "type": "com.example.ott.config.GoogleTranslateConfig",
+      "sourceType": "com.example.ott.config.GoogleTranslateConfig"
     },
     {
       "name": "ocr",
@@ -13,14 +13,9 @@
   ],
   "properties": [
     {
-      "name": "naver.papago.client-id",
+      "name": "google.api-key",
       "type": "java.lang.String",
-      "sourceType": "com.example.ott.config.PapagoConfig"
-    },
-    {
-      "name": "naver.papago.client-secret",
-      "type": "java.lang.String",
-      "sourceType": "com.example.ott.config.PapagoConfig"
+      "sourceType": "com.example.ott.config.GoogleTranslateConfig"
     },
     {
       "name": "ocr.save-dir",

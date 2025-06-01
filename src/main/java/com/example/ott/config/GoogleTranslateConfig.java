@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "translation.google")
+@ConfigurationProperties(prefix = "google")
 public class GoogleTranslateConfig {
     private String apiKey;
 }
