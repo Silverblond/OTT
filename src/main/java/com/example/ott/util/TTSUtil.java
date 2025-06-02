@@ -39,6 +39,10 @@ public class TTSUtil {
             String responseStr = response.body().string();
 
             JsonObject json = JsonParser.parseString(responseStr).getAsJsonObject();
+            if (!json.has("audioContent")) {
+                throw new RuntimeException("audioContent 누락 - 응답 JSON: " + responseStr);
+            }
+
             String audioContent = json.get("audioContent").getAsString();
             return Base64.getDecoder().decode(audioContent);
 

@@ -2,6 +2,7 @@ package com.example.ott.controller;
 
 import com.example.ott.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +16,7 @@ public class ImageController {
     private final FileStorageService fileStorageService;
 
     //Post - upload
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         //파일 저장 후 저장된 경로 반환
         String savedPath = fileStorageService.saveImage(file);

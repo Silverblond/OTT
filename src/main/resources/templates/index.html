@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>OCR 번역 TTS 테스트</title>
+</head>
+<body>
+<h2>1. 이미지 업로드</h2>
+<input type="file" id="imageInput" />
+<button onclick="uploadImage()">업로드</button>
+<p id="uploadResult"></p>
+
+<h2>2. OCR 실행</h2>
+<button onclick="performOCR()">OCR 시작</button>
+<pre id="ocrResult"></pre>
+
+<h2>3. 번역</h2>
+<input type="text" id="targetLang" placeholder="예: en, ja, zh-CN" />
+<button onclick="translateText()">번역 시작</button>
+<pre id="translationResult"></pre>
+
+<h2>4. 음성 출력</h2>
+<button onclick="generateTTS()">TTS 실행</button>
+<audio id="audioPlayer" controls></audio>
+
+<!-- ✅ JS 외부 파일 포함 -->
+<script src="/js/main.js"></script>
+</body>
+</html>

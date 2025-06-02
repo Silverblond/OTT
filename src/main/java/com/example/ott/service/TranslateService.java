@@ -3,7 +3,6 @@ package com.example.ott.service;
 import com.example.ott.config.GoogleTranslateConfig;
 import com.example.ott.util.TranslateUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service

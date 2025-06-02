@@ -12,4 +12,4 @@ translate:
   default-lang: ko
 
 google:
-  api-key: AIzaSyDbUg8WCT8muYJ3cQ-_3f8Tp19fYF-n9dA
+  api-key: ${GOOGLE_API_KEY}
