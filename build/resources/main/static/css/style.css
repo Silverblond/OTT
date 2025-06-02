@@ -1,0 +1,16 @@
+#captureOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 9999;
+    cursor: crosshair;
+}
+
+.selectionBox {
+    position: absolute;
+    border: 2px dashed #2196f3;
+    background: rgba(33, 150, 243, 0.2);
+    pointer-events: none;
+}

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <title>OCR 번역 TTS 테스트</title>
+    <!-- html2canvas CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <h2>1. 이미지 업로드</h2>
@@ -12,6 +15,15 @@
 
 <h2>2. OCR 실행</h2>
 <button onclick="performOCR()">OCR 시작</button>
+
+<h2>5. 스크린샷 캡처 및 OCR 실행</h2>
+<button id="screenshotBtn">📸 스크린샷 캡처</button>
+<span id="screenshotStatus"></span>
+
+<h2>6. 영역 지정 스크린샷</h2>
+<button id="areaCaptureBtn">📐 영역 지정 후 OCR</button>
+<span id="areaCaptureStatus"></span>
+
 <pre id="ocrResult"></pre>
 
 <h2>3. 번역</h2>
