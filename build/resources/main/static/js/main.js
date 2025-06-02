@@ -202,3 +202,14 @@ async function captureRegion(rect) {
         document.getElementById("areaCaptureStatus").innerText = "✅ OCR 완료";
     });
 }
+
+function showScreen(targetId) {
+    const allScreens = ["mainScreen", "ocrScreen", "resultScreen"];
+    allScreens.forEach(id => {
+        document.getElementById(id).style.display = (id === targetId) ? "block" : "none";
+    });
+}
+
+document.getElementById("startBtn").addEventListener("click", () => {
+    showScreen("ocrScreen");
+});

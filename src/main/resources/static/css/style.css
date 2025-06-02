@@ -1,3 +1,43 @@
+#mainScreen, #ocrScreen, #resultScreen {
+    padding: 20px;
+    margin: auto;
+    max-width: 800px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+h1, h2 {
+    color: #2c3e50;
+}
+
+button {
+    margin: 5px;
+    padding: 8px 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+pre {
+    background: #f5f5f5;
+    padding: 10px;
+    border: 1px solid #ccc;
+    overflow-x: auto;
+}
+
+/* 캡처용 오버레이 */
 #captureOverlay {
     position: fixed;
     top: 0; left: 0;
