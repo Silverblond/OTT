@@ -11,9 +11,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OCRService {
 
-    public List<String> performOCR(String imagePath) {
-        try{
-            String fullText = TesseractUtil.extractText(imagePath);
+    /**
+     * 주어진 언어로 이미지에서 텍스트 추출
+     *
+     * @param imagePath 이미지 경로
+     * @param lang      언어 코드
+     * @return 줄 단위로 나눈 OCR 결과
+     */
+    public List<String> performOCR(String imagePath, String lang) {
+        try {
+            if (lang == null || lang.trim().isEmpty()) {
+                lang = "kor"; // 기본값 설정
+            }
+            String fullText = TesseractUtil.extractText(imagePath, lang);
             return TesseractUtil.splitLines(fullText);
         } catch (TesseractException e) {
             throw new RuntimeException("OCR 처리 실패", e);

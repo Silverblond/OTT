@@ -4,10 +4,7 @@ import com.example.ott.dto.OCRRequestDto;
 import com.example.ott.dto.OCRResultDto;
 import com.example.ott.service.OCRService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,7 +17,10 @@ public class OCRController {
 
     @PostMapping
     public OCRResultDto ocrImage(@RequestBody OCRRequestDto requestDto) {
-        List<String> lines = ocrService.performOCR(requestDto.getImagePath());
+        String imagePath = requestDto.getImagePath();
+        String lang = requestDto.getLang(); // 클라이언트로부터 전달받은 언어 코드
+
+        List<String> lines = ocrService.performOCR(imagePath, lang);
         return new OCRResultDto(lines);
     }
 }

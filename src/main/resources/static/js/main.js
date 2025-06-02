@@ -1,6 +1,6 @@
-let imagePath = "";         // 서버에 저장된 이미지 경로 저장용
-let translatedText = "";    // 번역된 텍스트 저장용
-let languageCode = "en-US"; // TTS용 언어 코드
+let imagePath = "";
+let translatedText = "";
+let languageCode = "en-US";
 const BASE_URL = "http://localhost:8080";
 
 // 언어 코드 매핑 함수
@@ -10,208 +10,195 @@ function getTTSLang(target) {
         en: "en-US",
         ja: "ja-JP",
         zh: "zh-CN",
+        "zh-CN": "zh-CN",
+        "zh-TW": "zh-TW",
+        fr: "fr-FR",
+        de: "de-DE",
+        es: "es-ES",
+        ru: "ru-RU",
+        vi: "vi-VN",
+        th: "th-TH"
     };
-    return map[target] || "en-US";  // 기본 영어
+    return map[target] || "en-US";
 }
 
-// 이미지 업로드
+// 번역 언어 드롭다운 초기화
+document.addEventListener("DOMContentLoaded", () => {
+    const select = document.getElementById("targetLang");
+    const options = [
+        { code: "en", label: "영어" },
+        { code: "ko", label: "한국어" },
+        { code: "ja", label: "일본어" },
+        { code: "zh-CN", label: "중국어 간체" },
+        { code: "zh-TW", label: "중국어 번체" },
+        { code: "fr", label: "프랑스어" },
+        { code: "de", label: "독일어" },
+        { code: "es", label: "스페인어" },
+        { code: "ru", label: "러시아어" },
+        { code: "vi", label: "베트남어" },
+        { code: "th", label: "태국어" },
+    ];
+
+    options.forEach(opt => {
+        const option = document.createElement("option");
+        option.value = opt.code;
+        option.textContent = opt.label;
+        select.appendChild(option);
+    });
+});
+
 async function uploadImage() {
     const input = document.getElementById("imageInput");
     const file = input.files[0];
-    if (!file) {
-        alert("이미지를 선택해주세요.");
-        return;
-    }
-
+    if (!file) return alert("이미지를 선택해주세요.");
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(`${BASE_URL}/api/image/upload`, {
+    const res = await fetch(`${BASE_URL}/api/image/upload`, {
         method: "POST",
         body: formData
     });
-
-    const result = await response.text();
-    imagePath = result;
+    imagePath = await res.text();
     document.getElementById("uploadResult").innerText = "✅ 업로드 완료: " + imagePath;
 }
 
-// OCR 실행
 async function performOCR() {
-    const response = await fetch(`${BASE_URL}/api/ocr`, {
+    const lang = document.getElementById("ocrLang").value;
+    const res = await fetch(`${BASE_URL}/api/ocr`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imagePath })
+        body: JSON.stringify({ imagePath, lang })
     });
-
-    const result = await response.json();
+    const result = await res.json();
     document.getElementById("ocrResult").innerText = result.lines.join("\n");
 }
 
-// 번역 실행
 async function translateText() {
     const targetLang = document.getElementById("targetLang").value;
     const originalText = document.getElementById("ocrResult").innerText;
-
-    const response = await fetch(`${BASE_URL}/api/translate`, {
+    const res = await fetch(`${BASE_URL}/api/translate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ originalText, targetLang })
     });
-
-    const result = await response.json();
+    const result = await res.json();
     translatedText = result.translatedText;
-    languageCode = getTTSLang(targetLang); // 변환된 TTS용 언어코드 저장
+    languageCode = getTTSLang(targetLang);
     document.getElementById("translationResult").innerText = translatedText;
 }
 
-// TTS 생성
 async function generateTTS() {
-    const response = await fetch(`${BASE_URL}/api/tts`, {
+    const res = await fetch(`${BASE_URL}/api/tts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: translatedText, languageCode })
     });
-
-    const blob = await response.blob();
+    const blob = await res.blob();
     const audioUrl = URL.createObjectURL(blob);
     document.getElementById("audioPlayer").src = audioUrl;
-}
-
-// 전체 화면 캡처
-async function captureAndSend() {
-    document.getElementById("screenshotStatus").innerText = "📷 캡처 중...";
-
-    const canvas = await html2canvas(document.body);
-    canvas.toBlob(async function(blob) {
-        const file = new File([blob], "screenshot.png", { type: "image/png" });
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const uploadResponse = await fetch(`${BASE_URL}/api/image/upload`, {
-            method: "POST",
-            body: formData
-        });
-
-        if (!uploadResponse.ok) {
-            document.getElementById("screenshotStatus").innerText = "❌ 업로드 실패";
-            return;
-        }
-
-        const result = await uploadResponse.text();
-        imagePath = result;
-        document.getElementById("uploadResult").innerText = "✅ 업로드 완료: " + imagePath;
-
-        const ocrResponse = await fetch(`${BASE_URL}/api/ocr`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ imagePath })
-        });
-
-        const ocrResult = await ocrResponse.json();
-        document.getElementById("ocrResult").innerText = ocrResult.lines.join("\n");
-        document.getElementById("screenshotStatus").innerText = "✅ OCR 완료";
-    });
 }
 
 document.getElementById("screenshotBtn").addEventListener("click", captureAndSend);
 document.getElementById("areaCaptureBtn").addEventListener("click", startAreaCapture);
 
-// 영역 캡처 실행
+async function captureAndSend() {
+    const lang = document.getElementById("ocrLang").value;
+    document.getElementById("screenshotStatus").innerText = "📷 캡처 중...";
+    const canvas = await html2canvas(document.body);
+    canvas.toBlob(async blob => {
+        const file = new File([blob], "screenshot.png", { type: "image/png" });
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadRes = await fetch(`${BASE_URL}/api/image/upload`, {
+            method: "POST",
+            body: formData
+        });
+        imagePath = await uploadRes.text();
+        document.getElementById("uploadResult").innerText = "✅ 업로드 완료: " + imagePath;
+        const ocrRes = await fetch(`${BASE_URL}/api/ocr`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imagePath, lang })
+        });
+        const result = await ocrRes.json();
+        document.getElementById("ocrResult").innerText = result.lines.join("\n");
+        document.getElementById("screenshotStatus").innerText = "✅ OCR 완료";
+    });
+}
+
 function startAreaCapture() {
     const overlay = document.createElement("div");
     overlay.id = "captureOverlay";
-    overlay.style.position = "fixed";
-    overlay.style.top = 0;
-    overlay.style.left = 0;
-    overlay.style.width = "100vw";
-    overlay.style.height = "100vh";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.2)";
-    overlay.style.zIndex = 9999;
-    overlay.style.cursor = "crosshair";
+    overlay.style = `
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.2); z-index: 9999; cursor: crosshair;
+    `;
     document.body.appendChild(overlay);
 
     let startX, startY, box;
 
-    overlay.addEventListener("mousedown", function (e) {
+    overlay.addEventListener("mousedown", e => {
         startX = e.clientX;
         startY = e.clientY;
 
         box = document.createElement("div");
         box.className = "selectionBox";
-        box.style.position = "absolute";
-        box.style.border = "2px dashed #2196f3";
-        box.style.background = "rgba(33, 150, 243, 0.2)";
-        box.style.left = `${startX}px`;
-        box.style.top = `${startY}px`;
+        box.style = `
+            position: absolute; border: 2px dashed #2196f3;
+            background: rgba(33,150,243,0.2);
+            left: ${startX}px; top: ${startY}px;
+        `;
         overlay.appendChild(box);
 
-        function onMouseMove(ev) {
+        const onMouseMove = ev => {
             const width = ev.clientX - startX;
             const height = ev.clientY - startY;
             box.style.width = `${Math.abs(width)}px`;
             box.style.height = `${Math.abs(height)}px`;
             box.style.left = `${Math.min(ev.clientX, startX)}px`;
             box.style.top = `${Math.min(ev.clientY, startY)}px`;
-        }
+        };
 
-        function onMouseUp(ev) {
+        const onMouseUp = async () => {
             overlay.removeEventListener("mousemove", onMouseMove);
-            overlay.removeEventListener("mouseup", onMouseUp);
-            const rect = box.getBoundingClientRect();
-            captureRegion(rect);
             overlay.remove();
-        }
+            const rect = box.getBoundingClientRect();
+            await captureRegion(rect);
+        };
 
         overlay.addEventListener("mousemove", onMouseMove);
         overlay.addEventListener("mouseup", onMouseUp);
     });
 }
 
-// 영역 캡처 후 업로드 및 OCR
 async function captureRegion(rect) {
+    const lang = document.getElementById("ocrLang").value;
     document.getElementById("areaCaptureStatus").innerText = "📷 영역 캡처 중...";
     const canvas = await html2canvas(document.body);
-
     const croppedCanvas = document.createElement("canvas");
     const dpr = window.devicePixelRatio || 1;
     croppedCanvas.width = rect.width * dpr;
     croppedCanvas.height = rect.height * dpr;
-
     const ctx = croppedCanvas.getContext("2d");
-    ctx.scale(dpr, dpr);  // 실제 캔버스 크기를 확대
-    ctx.drawImage(
-        canvas,
-        rect.left, rect.top, rect.width, rect.height,
-        0, 0, rect.width, rect.height
-    );
-    croppedCanvas.toBlob(async function (blob) {
+    ctx.scale(dpr, dpr);
+    ctx.drawImage(canvas, rect.left, rect.top, rect.width, rect.height, 0, 0, rect.width, rect.height);
+    croppedCanvas.toBlob(async blob => {
         const file = new File([blob], "area-capture.png", { type: "image/png" });
         const formData = new FormData();
         formData.append("file", file);
-
-        const uploadResponse = await fetch(`${BASE_URL}/api/image/upload`, {
+        const uploadRes = await fetch(`${BASE_URL}/api/image/upload`, {
             method: "POST",
             body: formData
         });
-
-        if (!uploadResponse.ok) {
-            document.getElementById("areaCaptureStatus").innerText = "❌ 업로드 실패";
-            return;
-        }
-
-        const result = await uploadResponse.text();
-        imagePath = result;
+        imagePath = await uploadRes.text();
         document.getElementById("uploadResult").innerText = "✅ 업로드 완료: " + imagePath;
-
-        const ocrResponse = await fetch(`${BASE_URL}/api/ocr`, {
+        const ocrRes = await fetch(`${BASE_URL}/api/ocr`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ imagePath })
+            body: JSON.stringify({ imagePath, lang })
         });
-
-        const ocrResult = await ocrResponse.json();
-        document.getElementById("ocrResult").innerText = ocrResult.lines.join("\n");
+        const result = await ocrRes.json();
+        document.getElementById("ocrResult").innerText = result.lines.join("\n");
         document.getElementById("areaCaptureStatus").innerText = "✅ OCR 완료";
     });
 }

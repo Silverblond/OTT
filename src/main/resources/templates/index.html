@@ -3,20 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <title>OCR 번역 TTS 테스트</title>
-    <!-- html2canvas CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
 <h2>1. 이미지 업로드</h2>
 <input type="file" id="imageInput" />
 <button onclick="uploadImage()">업로드</button>
 <p id="uploadResult"></p>
 
+<h2>OCR 언어 선택</h2>
+<select id="ocrLang">
+    <option value="eng">English</option>
+    <option value="kor" selected>한국어</option>
+    <option value="jpn">日本語</option>
+    <option value="chi_sim">中文 (간체)</option>
+    <option value="rus">Русский</option>
+    <option value="deu">Deutsch</option>
+    <option value="fra">Français</option>
+    <option value="spa">Español</option>
+</select>
+
 <h2>2. OCR 실행</h2>
 <button onclick="performOCR()">OCR 시작</button>
 
-<h2>5. 스크린샷 캡처 및 OCR 실행</h2>
+<h2>5. 전체 스크린샷</h2>
 <button id="screenshotBtn">📸 스크린샷 캡처</button>
 <span id="screenshotStatus"></span>
 
@@ -27,7 +39,8 @@
 <pre id="ocrResult"></pre>
 
 <h2>3. 번역</h2>
-<input type="text" id="targetLang" placeholder="예: en, ja, zh-CN" />
+<label for="targetLang">번역할 언어 선택:</label>
+<select id="targetLang"></select>
 <button onclick="translateText()">번역 시작</button>
 <pre id="translationResult"></pre>
 
@@ -35,7 +48,6 @@
 <button onclick="generateTTS()">TTS 실행</button>
 <audio id="audioPlayer" controls></audio>
 
-<!-- ✅ JS 외부 파일 포함 -->
 <script src="/js/main.js"></script>
 </body>
 </html>

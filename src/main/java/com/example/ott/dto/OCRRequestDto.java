@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class OCRRequestDto {
     private String imagePath; //저장된 이미지 경로
+    private String lang;
 }
