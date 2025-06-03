@@ -13,7 +13,8 @@ const defaultSettings = {
     defaultTranslateLang: "en",
     useCustomFilename: false,
     customFilename: "",
-    siteLanguage: "ko"
+    siteLanguage: "ko",
+    enhancedOcrMode: false
 };
 
 // 번역된 텍스트 정의
@@ -79,7 +80,9 @@ const translations = {
         totalLines: "총 {count}줄의 텍스트가 인식되었습니다.",
         totalWords: "총 {count}개의 단어가 인식되었습니다.",
         selectFile: "파일 선택",
-        savePathPlaceholder: "예: /Users/사용자이름/Desktop 또는 C:\\Users\\사용자이름\\Desktop"
+        savePathPlaceholder: "예: /Users/사용자이름/Desktop 또는 C:\\Users\\사용자이름\\Desktop",
+        enhancedOcrMode: "OCR 정확도 향상 모드:",
+        enhancedOcrModeDesc: "이미지 전처리 및 해상도 향상을 통해 OCR 정확도를 개선합니다."
     },
     en: {
         mainTitle: "📄 OCR Translation TTS System",
@@ -142,7 +145,9 @@ const translations = {
         totalLines: "Total {count} lines of text recognized.",
         totalWords: "Total {count} words recognized.",
         selectFile: "Select File",
-        savePathPlaceholder: "Example: /Users/username/Desktop or C:\\Users\\username\\Desktop"
+        savePathPlaceholder: "Example: /Users/username/Desktop or C:\\Users\\username\\Desktop",
+        enhancedOcrMode: "Enhanced OCR Mode:",
+        enhancedOcrModeDesc: "Improves OCR accuracy through image preprocessing and resolution enhancement."
     },
 };
 
@@ -280,7 +285,8 @@ function saveSettings() {
         defaultTranslateLang: document.getElementById("targetLang")?.value || "en",
         useCustomFilename: document.getElementById("customFilename").checked,
         customFilename: document.getElementById("filenameInput").value.trim(),
-        siteLanguage: document.getElementById("siteLanguage").value
+        siteLanguage: document.getElementById("siteLanguage").value,
+        enhancedOcrMode: document.getElementById("enhancedOcrMode").checked
     };
     
     localStorage.setItem("appSettings", JSON.stringify(settings));
@@ -331,6 +337,12 @@ function applySettings(settings) {
     if (siteLanguage) {
         siteLanguage.value = settings.siteLanguage;
         changeSiteLanguage(); // 언어 변경 즉시 적용
+    }
+
+    // OCR 정확도 향상 모드 설정 적용
+    const enhancedOcrMode = document.getElementById("enhancedOcrMode");
+    if (enhancedOcrMode) {
+        enhancedOcrMode.checked = settings.enhancedOcrMode || false;
     }
 }
 
@@ -650,7 +662,56 @@ async function captureRegion(rect) {
     }
 }
 
-// 이미지 업로드 함수
+// OCR 실행 함수 수정
+async function performOCR() {
+    if (!imagePath) {
+        alert(getTranslatedMessage("noFileSelected"));
+        return;
+    }
+
+    const lang = Array.from(selectedOcrLangs).join("+");
+    const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
+    
+    try {
+        document.getElementById("ocrResult").innerText = getTranslatedMessage("ocrProcessing");
+        
+        const res = await fetch(`${BASE_URL}/api/ocr`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                imagePath, 
+                lang,
+                enhancedMode: settings.enhancedOcrMode
+            })
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || "OCR 처리 실패");
+        }
+
+        const result = await res.json();
+        document.getElementById("ocrResult").innerText = result.lines.join("\n");
+        
+        // 줄 수와 단어 수 계산
+        const lineCount = result.lines.length;
+        const wordCount = result.lines.reduce((count, line) => count + line.split(/\s+/).filter(word => word.length > 0).length, 0);
+        
+        // 번역된 통계 메시지 표시
+        const statsText = [
+            getTranslatedMessage("totalLines", { count: lineCount }),
+            getTranslatedMessage("totalWords", { count: wordCount })
+        ].join("\n");
+        
+        document.getElementById("ocrStats").innerText = statsText;
+        document.getElementById("uploadResult").textContent = getTranslatedMessage("ocrSuccess");
+    } catch (error) {
+        console.error("OCR 에러:", error);
+        document.getElementById("uploadResult").textContent = getTranslatedMessage("ocrFail");
+    }
+}
+
+// 이미지 업로드 함수 수정
 async function uploadImage() {
     const fileInput = document.getElementById("imageInput");
     const file = fileInput.files[0];
@@ -681,47 +742,6 @@ async function uploadImage() {
     } catch (error) {
         console.error("업로드 에러:", error);
         document.getElementById("uploadResult").textContent = getTranslatedMessage("uploadFail");
-    }
-}
-
-// OCR 실행 함수
-async function performOCR() {
-    if (!imagePath) {
-        alert(getTranslatedMessage("noFileSelected"));
-        return;
-    }
-
-    const lang = Array.from(selectedOcrLangs).join("+");
-    try {
-        document.getElementById("ocrResult").innerText = getTranslatedMessage("ocrProcessing");
-        const res = await fetch(`${BASE_URL}/api/ocr`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ imagePath, lang })
-        });
-
-        if (!res.ok) {
-            throw new Error("OCR 처리 실패");
-        }
-
-        const result = await res.json();
-        document.getElementById("ocrResult").innerText = result.lines.join("\n");
-        
-        // 줄 수와 단어 수 계산
-        const lineCount = result.lines.length;
-        const wordCount = result.lines.reduce((count, line) => count + line.split(/\s+/).filter(word => word.length > 0).length, 0);
-        
-        // 번역된 통계 메시지 표시
-        const statsText = [
-            getTranslatedMessage("totalLines", { count: lineCount }),
-            getTranslatedMessage("totalWords", { count: wordCount })
-        ].join("\n");
-        
-        document.getElementById("ocrStats").innerText = statsText;
-        document.getElementById("uploadResult").textContent = getTranslatedMessage("ocrSuccess");
-    } catch (error) {
-        console.error("OCR 에러:", error);
-        document.getElementById("uploadResult").textContent = getTranslatedMessage("ocrFail");
     }
 }
 
@@ -812,4 +832,39 @@ function getLangKeyFromCode(code) {
         'tha': 'langTha'
     };
     return codeToKey[code] || 'langEng';
+}
+
+// 이미지 전처리 함수
+async function preprocessImage(canvas) {
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    // 그레이스케일 변환 및 대비 향상
+    for (let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        const threshold = 128;
+        const value = avg > threshold ? 255 : 0;
+        data[i] = data[i + 1] = data[i + 2] = value;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+}
+
+// 이미지 해상도 향상 함수
+async function enhanceResolution(canvas) {
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // 2배 해상도로 확대
+    tempCanvas.width = canvas.width * 2;
+    tempCanvas.height = canvas.height * 2;
+    
+    // 이미지 스케일링
+    tempCtx.imageSmoothingEnabled = true;
+    tempCtx.imageSmoothingQuality = 'high';
+    tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+    
+    return tempCanvas;
 }

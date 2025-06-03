@@ -94,6 +94,12 @@
         </div>
 
         <div class="setting-item">
+            <label for="enhancedOcrMode" data-translate="enhancedOcrMode">OCR 정확도 향상 모드:</label>
+            <input type="checkbox" id="enhancedOcrMode" />
+            <div class="setting-description" data-translate="enhancedOcrModeDesc">이미지 전처리 및 해상도 향상을 통해 OCR 정확도를 개선합니다.</div>
+        </div>
+
+        <div class="setting-item">
             <label for="customFilename" data-translate="customFilename">파일명 직접 입력:</label>
             <input type="checkbox" id="customFilename" onchange="toggleCustomFilename()" />
             <input type="text" id="filenameInput" placeholder="파일명 입력" style="display: none;" />
