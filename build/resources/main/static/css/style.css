@@ -21,11 +21,13 @@ h1, h2 {
 button {
     margin: 5px;
     padding: 10px 16px;
+    min-width: 120px;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 button:hover {
@@ -37,6 +39,30 @@ pre {
     padding: 10px;
     border: 1px solid #ddd;
     white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#uploadResult {
+    font-weight: bold;
+    color: #27ae60;
+    margin-top: 10px;
+}
+
+#ocrStats {
+    color: #666;
+    font-size: 0.95em;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+#imagePreview {
+    margin-top: 10px;
+    max-width: 100%;
+    max-height: 400px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: none;
 }
 
 .tag-container {

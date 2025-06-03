@@ -19,6 +19,9 @@
     <button onclick="uploadImage()">업로드</button>
     <p id="uploadResult"></p>
 
+    <!-- ✅ 이미지 미리보기 -->
+    <img id="imagePreview" style="max-width: 100%; margin-top: 10px; display: none;" />
+
     <h2>2. OCR 언어 선택</h2>
     <div>
         <select id="ocrLangDropdown">
@@ -49,11 +52,23 @@
     <h2>📝 OCR 결과</h2>
     <pre id="ocrResult"></pre>
 
+    <!-- ✅ 글자 수/단어 수 카운터 -->
+    <p id="ocrStats"></p>
+
+    <!-- ✅ OCR 결과 저장 버튼 -->
+    <button onclick="saveOCRResult()">📝 OCR 결과 저장</button>
+
     <h2>🌐 번역</h2>
     <label for="targetLang">번역할 언어 선택:</label>
     <select id="targetLang"></select>
     <button onclick="translateText()">번역 시작</button>
     <pre id="translationResult"></pre>
+
+    <!-- ✅ 번역 결과 저장 버튼 -->
+    <button onclick="saveTranslationResult()">🌐 번역 결과 저장</button>
+
+    <!-- ✅ 번역 복사 버튼 -->
+    <button onclick="copyTranslation()">📋 번역 복사</button>
 
     <h2>🔊 TTS</h2>
     <button onclick="generateTTS()">TTS 실행</button>

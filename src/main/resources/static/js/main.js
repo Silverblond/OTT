@@ -1,3 +1,4 @@
+// OCR 번역 TTS 시스템 JS 전체 코드
 let imagePath = "";
 let translatedText = "";
 let languageCode = "en-US";
@@ -44,6 +45,11 @@ async function uploadImage() {
     const input = document.getElementById("imageInput");
     const file = input.files[0];
     if (!file) return alert("이미지를 선택하세요.");
+
+    const preview = document.getElementById("imagePreview");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+
     const formData = new FormData();
     formData.append("file", file);
     const res = await fetch(`${BASE_URL}/api/image/upload`, { method: "POST", body: formData });
@@ -86,6 +92,11 @@ async function performOCR() {
         ocrOutput.innerText = result.lines.length > 0
             ? result.lines.join("\n")
             : "⚠️ 텍스트를 인식하지 못했습니다.";
+
+        const text = ocrOutput.innerText.trim();
+        const charCount = text.length;
+        const wordCount = text.split(/\s+/).filter(Boolean).length;
+        document.getElementById("ocrStats").innerText = `총 글자 수: ${charCount} / 단어 수: ${wordCount}`;
     } catch (err) {
         console.error("❗ OCR 처리 중 오류 발생:", err);
         alert("OCR 처리 중 오류가 발생했습니다.");
@@ -95,16 +106,11 @@ async function performOCR() {
 function initTargetLangDropdown() {
     const select = document.getElementById("targetLang");
     const options = [
-        { code: "en", label: "영어" },
-        { code: "ko", label: "한국어" },
-        { code: "ja", label: "일본어" },
-        { code: "zh-CN", label: "중국어 간체" },
-        { code: "zh-TW", label: "중국어 번체" },
-        { code: "fr", label: "프랑스어" },
-        { code: "de", label: "독일어" },
-        { code: "es", label: "스페인어" },
-        { code: "ru", label: "러시아어" },
-        { code: "vi", label: "베트남어" },
+        { code: "en", label: "영어" }, { code: "ko", label: "한국어" },
+        { code: "ja", label: "일본어" }, { code: "zh-CN", label: "중국어 간체" },
+        { code: "zh-TW", label: "중국어 번체" }, { code: "fr", label: "프랑스어" },
+        { code: "de", label: "독일어" }, { code: "es", label: "스페인어" },
+        { code: "ru", label: "러시아어" }, { code: "vi", label: "베트남어" },
         { code: "th", label: "태국어" }
     ];
     options.forEach(opt => {
@@ -140,6 +146,48 @@ async function generateTTS() {
     document.getElementById("audioPlayer").src = audioUrl;
 }
 
+function saveOCRResult() {
+    const text = document.getElementById("ocrResult")?.innerText || "";
+    if (!text.trim()) return alert("OCR 결과가 비어 있습니다.");
+    downloadTextFile(text, "ocr_result.txt");
+}
+
+function saveTranslationResult() {
+    const text = document.getElementById("translationResult")?.innerText || "";
+    if (!text.trim()) return alert("번역 결과가 비어 있습니다.");
+    downloadTextFile(text, "translation_result.txt");
+}
+
+function copyTranslation() {
+    const text = document.getElementById("translationResult")?.innerText || "";
+    if (!text.trim()) return alert("복사할 번역 결과가 없습니다.");
+    navigator.clipboard.writeText(text)
+        .then(() => alert("✅ 번역 결과가 클립보드에 복사되었습니다."))
+        .catch(() => alert("❌ 복사에 실패했습니다."));
+}
+
+function downloadTextFile(content, filename) {
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function getTTSLang(target) {
+    const map = {
+        ko: "ko-KR", en: "en-US", ja: "ja-JP", zh: "zh-CN",
+        "zh-CN": "zh-CN", "zh-TW": "zh-TW", fr: "fr-FR", de: "de-DE",
+        es: "es-ES", ru: "ru-RU", vi: "vi-VN", th: "th-TH"
+    };
+    return map[target] || "en-US";
+}
+
+// 📸 캡처 및 영역 캡처 함수 생략 안 함
 async function captureAndSend() {
     const lang = Array.from(selectedOcrLangs).join("+");
     const canvas = await html2canvas(document.body);
@@ -219,12 +267,4 @@ async function captureRegion(rect) {
         const result = await ocrRes.json();
         document.getElementById("ocrResult").innerText = result.lines.join("\n");
     });
-}
-
-function getTTSLang(target) {
-    const map = {
-        ko: "ko-KR", en: "en-US", ja: "ja-JP", zh: "zh-CN", "zh-CN": "zh-CN", "zh-TW": "zh-TW",
-        fr: "fr-FR", de: "de-DE", es: "es-ES", ru: "ru-RU", vi: "vi-VN", th: "th-TH"
-    };
-    return map[target] || "en-US";
 }
