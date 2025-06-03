@@ -166,6 +166,14 @@ function copyTranslation() {
         .catch(() => alert("❌ 복사에 실패했습니다."));
 }
 
+function copyOCRResult() {
+    const text = document.getElementById("ocrResult")?.innerText || "";
+    if (!text.trim()) return alert("복사할 OCR 결과가 없습니다.");
+    navigator.clipboard.writeText(text)
+        .then(() => alert("✅ OCR 결과가 클립보드에 복사되었습니다."))
+        .catch(() => alert("❌ 복사에 실패했습니다."));
+}
+
 function downloadTextFile(content, filename) {
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
