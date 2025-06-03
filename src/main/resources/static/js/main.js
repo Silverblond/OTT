@@ -4,13 +4,13 @@ let translatedText = "";
 let languageCode = "en-US";
 const BASE_URL = "http://localhost:8080";
 let selectedOcrLangs = new Set();
+let previousScreen = "mainScreen"; // 이전 화면을 추적하는 변수 추가
 
 // 기본 설정
 const defaultSettings = {
     darkMode: false,
     defaultOcrLang: ["kor"],
     defaultTranslateLang: "en",
-    savePath: "",
     useCustomFilename: false,
     customFilename: "",
     siteLanguage: "ko"
@@ -41,7 +41,6 @@ const translations = {
         backToOcr: "← 다시 OCR 화면",
         darkMode: "다크 모드:",
         defaultOcrLang: "기본 OCR 언어 설정:",
-        savePath: "기본 저장 경로:",
         customFilename: "파일명 직접 입력:",
         siteLanguage: "사이트 언어:",
         applySettings: "설정 저장",
@@ -105,7 +104,6 @@ const translations = {
         backToOcr: "← Back to OCR",
         darkMode: "Dark Mode:",
         defaultOcrLang: "Default OCR Language:",
-        savePath: "Default Save Path:",
         customFilename: "Custom Filename:",
         siteLanguage: "Site Language:",
         applySettings: "Apply Settings",
@@ -189,11 +187,30 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("appSettings", JSON.stringify(settings));
         });
     }
+
+    // 설정 화면의 이전 화면으로 돌아가기 버튼 이벤트
+    const backToPreviousBtn = document.querySelector('#settingsScreen button[data-translate="backToPrevious"]');
+    if (backToPreviousBtn) {
+        backToPreviousBtn.addEventListener("click", () => {
+            showScreen(previousScreen);
+        });
+    }
 });
 
-// 화면 전환 함수
+// 화면 전환 함수 수정
 function showScreen(targetId) {
     const screens = ["mainScreen", "ocrScreen", "resultScreen", "settingsScreen"];
+    
+    // 설정 화면으로 이동할 때 현재 화면을 저장
+    if (targetId === "settingsScreen") {
+        screens.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.style.display === "block") {
+                previousScreen = id;
+            }
+        });
+    }
+    
     screens.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -261,7 +278,6 @@ function saveSettings() {
         darkMode: document.getElementById("darkModeToggle").checked,
         defaultOcrLang: [document.getElementById("defaultLang").value],
         defaultTranslateLang: document.getElementById("targetLang")?.value || "en",
-        savePath: document.getElementById("savePath").value.trim(),
         useCustomFilename: document.getElementById("customFilename").checked,
         customFilename: document.getElementById("filenameInput").value.trim(),
         siteLanguage: document.getElementById("siteLanguage").value
@@ -299,12 +315,6 @@ function applySettings(settings) {
     const targetLangSelect = document.getElementById("targetLang");
     if (targetLangSelect) {
         targetLangSelect.value = settings.defaultTranslateLang;
-    }
-
-    // 저장 경로 적용
-    const savePath = document.getElementById("savePath");
-    if (savePath) {
-        savePath.value = settings.savePath || "";
     }
 
     // 파일명 직접 입력 설정 적용
@@ -494,22 +504,44 @@ async function captureAndSend() {
 }
 
 function startAreaCapture() {
+    // 기존 오버레이가 있다면 제거
+    const existingOverlay = document.getElementById("captureOverlay");
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+
     const overlay = document.createElement("div");
     overlay.id = "captureOverlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    overlay.style.zIndex = "9999";
+    overlay.style.cursor = "crosshair";
     document.body.appendChild(overlay);
+
     let startX, startY, box;
+    let isCapturing = false;
 
     overlay.addEventListener("mousedown", e => {
+        isCapturing = true;
         startX = e.clientX;
         startY = e.clientY;
 
         box = document.createElement("div");
         box.className = "selectionBox";
+        box.style.position = "absolute";
+        box.style.border = "2px solid #00ff00";
+        box.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
         box.style.left = `${startX}px`;
         box.style.top = `${startY}px`;
         overlay.appendChild(box);
 
         const onMouseMove = e => {
+            if (!isCapturing) return;
+            
             const width = e.clientX - startX;
             const height = e.clientY - startY;
             box.style.width = `${Math.abs(width)}px`;
@@ -519,40 +551,103 @@ function startAreaCapture() {
         };
 
         const onMouseUp = async () => {
-            overlay.remove();
+            if (!isCapturing) return;
+            isCapturing = false;
+            
             const rect = box.getBoundingClientRect();
-            await captureRegion(rect);
+            if (rect.width < 10 || rect.height < 10) {
+                overlay.remove();
+                return;
+            }
+
+            try {
+                document.getElementById("areaCaptureStatus").textContent = getTranslatedMessage("ocrProcessing");
+                await captureRegion(rect);
+                document.getElementById("areaCaptureStatus").textContent = getTranslatedMessage("ocrSuccess");
+            } catch (error) {
+                console.error("영역 캡처 에러:", error);
+                document.getElementById("areaCaptureStatus").textContent = getTranslatedMessage("ocrFail");
+            } finally {
+                overlay.remove();
+            }
         };
 
         overlay.addEventListener("mousemove", onMouseMove);
         overlay.addEventListener("mouseup", onMouseUp);
     });
+
+    // ESC 키로 캡처 취소
+    const onKeyDown = (e) => {
+        if (e.key === "Escape") {
+            overlay.remove();
+            document.removeEventListener("keydown", onKeyDown);
+        }
+    };
+    document.addEventListener("keydown", onKeyDown);
 }
 
 async function captureRegion(rect) {
     const lang = Array.from(selectedOcrLangs).join("+");
-    const canvas = await html2canvas(document.body);
-    const cropped = document.createElement("canvas");
-    const dpr = window.devicePixelRatio || 1;
-    cropped.width = rect.width * dpr;
-    cropped.height = rect.height * dpr;
-    const ctx = cropped.getContext("2d");
-    ctx.scale(dpr, dpr);
-    ctx.drawImage(canvas, rect.left, rect.top, rect.width, rect.height, 0, 0, rect.width, rect.height);
-    cropped.toBlob(async blob => {
-        const file = new File([blob], "area.png", { type: "image/png" });
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch(`${BASE_URL}/api/image/upload`, { method: "POST", body: formData });
-        imagePath = await res.text();
-        const ocrRes = await fetch(`${BASE_URL}/api/ocr`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ imagePath, lang })
+    
+    try {
+        const canvas = await html2canvas(document.body, {
+            logging: false,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null
         });
-        const result = await ocrRes.json();
-        document.getElementById("ocrResult").innerText = result.lines.join("\n");
-    });
+
+        const cropped = document.createElement("canvas");
+        const dpr = window.devicePixelRatio || 1;
+        cropped.width = rect.width * dpr;
+        cropped.height = rect.height * dpr;
+        
+        const ctx = cropped.getContext("2d");
+        ctx.scale(dpr, dpr);
+        ctx.drawImage(
+            canvas,
+            rect.left, rect.top, rect.width, rect.height,
+            0, 0, rect.width, rect.height
+        );
+
+        return new Promise((resolve, reject) => {
+            cropped.toBlob(async blob => {
+                try {
+                    const file = new File([blob], "area.png", { type: "image/png" });
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    const res = await fetch(`${BASE_URL}/api/image/upload`, {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    if (!res.ok) {
+                        throw new Error("이미지 업로드 실패");
+                    }
+
+                    imagePath = await res.text();
+                    const ocrRes = await fetch(`${BASE_URL}/api/ocr`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ imagePath, lang })
+                    });
+
+                    if (!ocrRes.ok) {
+                        throw new Error("OCR 처리 실패");
+                    }
+
+                    const result = await ocrRes.json();
+                    document.getElementById("ocrResult").innerText = result.lines.join("\n");
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            }, "image/png");
+        });
+    } catch (error) {
+        throw error;
+    }
 }
 
 // 이미지 업로드 함수

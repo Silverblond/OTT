@@ -94,11 +94,6 @@
         </div>
 
         <div class="setting-item">
-            <label for="savePath" data-translate="savePath">기본 저장 경로:</label>
-            <input type="text" id="savePath" placeholder="예: C:/Users/Documents/OCR" />
-        </div>
-
-        <div class="setting-item">
             <label for="customFilename" data-translate="customFilename">파일명 직접 입력:</label>
             <input type="checkbox" id="customFilename" onchange="toggleCustomFilename()" />
             <input type="text" id="filenameInput" placeholder="파일명 입력" style="display: none;" />
@@ -113,7 +108,7 @@
         </div>
 
         <button onclick="saveSettings()" data-translate="applySettings">설정 저장</button>
-        <button onclick="showScreen('mainScreen')" data-translate="backToPrevious">이전 화면으로</button>
+        <button data-translate="backToPrevious">이전 화면으로</button>
     </div>
 </div>
 
