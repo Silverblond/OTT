@@ -1,3 +1,4 @@
+// -------------------- 설정 및 초기화 --------------------
 // OCR 번역 TTS 시스템 JS 전체 코드
 let imagePath = "";
 let translatedText = "";
@@ -157,10 +158,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!localStorage.getItem("appSettings")) {
         localStorage.setItem("appSettings", JSON.stringify(defaultSettings));
     }
-    
+
     loadSettings();
     initTargetLangDropdown();
-    
+
     // 시작하기 버튼 이벤트
     document.getElementById("startBtn").addEventListener("click", () => {
         showScreen("ocrScreen");
@@ -169,11 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // 캡처 버튼 이벤트
     document.getElementById("screenshotBtn").addEventListener("click", captureAndSend);
     document.getElementById("areaCaptureBtn").addEventListener("click", startAreaCapture);
-    
+
     // 파일 선택 이벤트 리스너
     const fileInput = document.getElementById("imageInput");
     const selectedFileName = document.getElementById("selectedFileName");
-    
+
     fileInput.addEventListener("change", () => {
         const file = fileInput.files[0];
         if (file) {
@@ -201,6 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// -------------------- 화면 전환 및 설정 처리 --------------------
 
 /**
  * 화면을 전환하여 지정된 화면을 표시합니다.
@@ -434,6 +437,7 @@ function addOcrLang() {
     updateSelectedLangTags();
 }
 
+// -------------------- 번역 및 언어 선택 드롭다운 --------------------
 /**
  * 선택된 OCR 언어 태그에서 해당 언어를 제거합니다.
  *
@@ -443,8 +447,6 @@ function removeOcrLang(code) {
     selectedOcrLangs.delete(code);
     updateSelectedLangTags();
 }
-
-// ... (기존 OCR, 번역, TTS 관련 함수들은 그대로 유지) ...
 
 /**
  * 번역 대상 언어 드롭다운을 초기화합니다.
@@ -495,6 +497,8 @@ async function translateText() {
     document.getElementById("translationResult").innerText = translatedText;
 }
 
+// -------------------- TTS (음성 합성) --------------------
+
 /**
  * 번역된 텍스트로 TTS 오디오를 생성합니다.
  *
@@ -510,6 +514,8 @@ async function generateTTS() {
     const audioUrl = URL.createObjectURL(blob);
     document.getElementById("audioPlayer").src = audioUrl;
 }
+
+// -------------------- OCR 및 번역 결과 처리 --------------------
 
 /**
  * OCR 결과 텍스트를 파일로 저장합니다.
@@ -572,6 +578,8 @@ function getTTSLang(target) {
     return map[target] || "en-US";
 }
 
+// -------------------- 화면 캡처 및 OCR --------------------
+
 /**
  * 화면 전체를 캡처하여 이미지 업로드 및 OCR 처리를 수행합니다.
  *
@@ -579,7 +587,16 @@ function getTTSLang(target) {
  */
 async function captureAndSend() {
     const lang = Array.from(selectedOcrLangs).join("+");
-    const canvas = await html2canvas(document.body);
+    const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
+
+    let canvas = await html2canvas(document.body);
+
+    // OCR 정확도 향상 모드 적용
+    if (settings.enhancedOcrMode) {
+        canvas = await preprocessImage(canvas);
+        canvas = await enhanceResolution(canvas);
+    }
+
     canvas.toBlob(async blob => {
         const file = new File([blob], "screenshot.png", { type: "image/png" });
         const formData = new FormData();
@@ -595,6 +612,7 @@ async function captureAndSend() {
         document.getElementById("ocrResult").innerText = result.lines.join("\n");
     });
 }
+
 
 /**
  * 사용자가 지정한 화면 영역을 캡처할 수 있도록 오버레이를 띄워줍니다.
@@ -690,9 +708,10 @@ function startAreaCapture() {
  */
 async function captureRegion(rect) {
     const lang = Array.from(selectedOcrLangs).join("+");
+    const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
 
     try {
-        const canvas = await html2canvas(document.body, {
+        let canvas = await html2canvas(document.body, {
             logging: false,
             useCORS: true,
             allowTaint: true,
@@ -712,8 +731,16 @@ async function captureRegion(rect) {
             0, 0, rect.width, rect.height
         );
 
+        let processedCanvas = cropped;
+
+        // OCR 정확도 향상 모드 적용
+        if (settings.enhancedOcrMode) {
+            processedCanvas = await preprocessImage(processedCanvas);
+            processedCanvas = await enhanceResolution(processedCanvas);
+        }
+
         return new Promise((resolve, reject) => {
-            cropped.toBlob(async blob => {
+            processedCanvas.toBlob(async blob => {
                 try {
                     const file = new File([blob], "area.png", { type: "image/png" });
                     const formData = new FormData();
@@ -724,9 +751,7 @@ async function captureRegion(rect) {
                         body: formData
                     });
 
-                    if (!res.ok) {
-                        throw new Error("이미지 업로드 실패");
-                    }
+                    if (!res.ok) throw new Error("이미지 업로드 실패");
 
                     imagePath = await res.text();
                     const ocrRes = await fetch(`${BASE_URL}/api/ocr`, {
@@ -735,9 +760,7 @@ async function captureRegion(rect) {
                         body: JSON.stringify({ imagePath, lang })
                     });
 
-                    if (!ocrRes.ok) {
-                        throw new Error("OCR 처리 실패");
-                    }
+                    if (!ocrRes.ok) throw new Error("OCR 처리 실패");
 
                     const result = await ocrRes.json();
                     document.getElementById("ocrResult").innerText = result.lines.join("\n");
@@ -858,6 +881,8 @@ function toggleCustomFilename() {
     }
 }
 
+// -------------------- 언어 변경 및 번역 도우미 --------------------
+
 /**
  * 사이트 언어를 변경하고 화면의 모든 번역 가능한 텍스트를 갱신합니다.
  */
@@ -950,6 +975,8 @@ function getLangKeyFromCode(code) {
     };
     return codeToKey[code] || 'langEng';
 }
+
+// -------------------- 이미지 전처리 및 해상도 향상 --------------------
 
 /**
  * 이미지 캔버스를 전처리(이진화 등)하여 반환합니다.
