@@ -15,6 +15,13 @@ import java.util.UUID;
 public class FileStorageService {
     private final OCRConfig ocrConfig;
 
+    /**
+     * 업로드된 이미지 파일을 저장하고 저장 경로를 반환합니다.
+     *
+     * @param file MultipartFile 형식의 업로드된 이미지 파일
+     * @return 저장된 이미지의 절대 경로
+     * @throws RuntimeException 이미지 저장 실패 시 발생
+     */
     public String saveImage(MultipartFile file){
         //상대 경로를 절대 경로로 변환후 정규화
         String uploadDir = Paths.get(ocrConfig.getSaveDir())

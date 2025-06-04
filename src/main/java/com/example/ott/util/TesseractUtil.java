@@ -34,7 +34,10 @@ public class TesseractUtil {
     }
 
     /**
-     * OCR 텍스트를 줄 단위로 정제
+     * OCR로 추출한 원시 텍스트를 줄 단위로 나누고 정제합니다.
+     *
+     * @param rawText OCR로 추출된 원시 텍스트
+     * @return 공백 줄을 제거하고 정제된 각 줄의 리스트
      */
     public static List<String> splitLines(String rawText) {
         return Arrays.stream(rawText.split("\\r?\\n"))

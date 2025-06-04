@@ -16,10 +16,10 @@ public class TranslateUtil {
     /**
      * Google 번역 API를 호출하여 주어진 텍스트를 대상 언어로 번역합니다.
      *
-     * @param text      원본 텍스트
+     * @param text 원본 텍스트
      * @param targetLang 대상 언어 코드 (예: "en", "ja", "zh-CN" 등)
-     * @param apiKey    Google Cloud API 키
-     * @return          번역된 텍스트
+     * @param apiKey Google Cloud API 키
+     * @return 번역된 텍스트 (줄 단위로 번역 결과를 이어붙인 문자열)
      */
     public static String translateText(String text, String targetLang, String apiKey) {
         if (text == null || text.trim().isEmpty()) {
@@ -46,6 +46,12 @@ public class TranslateUtil {
         }
     }
 
+    /**
+     * 긴 텍스트를 Google 번역 API의 요청 제한에 맞게 여러 청크로 나눕니다.
+     *
+     * @param text 원본 텍스트
+     * @return 번역 API 요청당 허용 가능한 길이로 나눈 텍스트 청크 리스트
+     */
     private static List<String> splitTextIntoChunks(String text) {
         List<String> chunks = new ArrayList<>();
         if (text == null || text.trim().isEmpty()) {
@@ -61,14 +67,14 @@ public class TranslateUtil {
             if (line.isEmpty()) continue;
 
             int lineLength = line.length();
-            
+
             if (currentLength + lineLength + 1 > MAX_CHARS_PER_REQUEST) {
                 if (currentChunk.length() > 0) {
                     chunks.add(currentChunk.toString());
                     currentChunk = new StringBuilder();
                     currentLength = 0;
                 }
-                
+
                 // 한 줄이 MAX_CHARS_PER_REQUEST보다 길 경우
                 if (lineLength > MAX_CHARS_PER_REQUEST) {
                     int start = 0;
@@ -96,6 +102,14 @@ public class TranslateUtil {
         return chunks;
     }
 
+    /**
+     * Google 번역 API를 호출하여 하나의 텍스트 청크를 번역합니다.
+     *
+     * @param text 번역할 텍스트 청크
+     * @param targetLang 대상 언어 코드
+     * @param apiKey Google Cloud API 키
+     * @return 번역된 텍스트 문자열
+     */
     private static String translateChunk(String text, String targetLang, String apiKey) {
         if (text == null || text.trim().isEmpty()) {
             return "";

@@ -202,10 +202,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// 화면 전환 함수 수정
+/**
+ * 화면을 전환하여 지정된 화면을 표시합니다.
+ *
+ * @param targetId 표시할 화면의 DOM ID
+ */
 function showScreen(targetId) {
     const screens = ["mainScreen", "ocrScreen", "resultScreen", "settingsScreen"];
-    
+
     // 설정 화면으로 이동할 때 현재 화면을 저장
     if (targetId === "settingsScreen") {
         screens.forEach(id => {
@@ -215,7 +219,7 @@ function showScreen(targetId) {
             }
         });
     }
-    
+
     screens.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -224,60 +228,86 @@ function showScreen(targetId) {
     });
 }
 
-// 설정 관련 함수들
+/**
+ * 로컬 스토리지에서 설정을 불러와 적용합니다.
+ *
+ * @return 불러온 설정 객체
+ */
 function loadSettings() {
     const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
     applySettings(settings);
     return settings;
 }
 
-// 운영체제 감지 함수
+/**
+ * 현재 운영체제에 맞는 경로 구분자를 반환합니다.
+ *
+ * @return 경로 구분자 문자열 ('/' 또는 '\\')
+ */
 function getOSPathSeparator() {
     return navigator.platform.includes('Win') ? '\\' : '/';
 }
 
-// 경로 정규화 함수
+/**
+ * 주어진 경로 문자열을 현재 OS에 맞는 경로 구분자로 정규화합니다.
+ *
+ * @param path 경로 문자열
+ * @return 정규화된 경로 문자열
+ */
 function normalizePath(path) {
     if (!path) return '';
-    
+
     // 모든 경로 구분자를 현재 OS에 맞는 구분자로 변환
     const separator = getOSPathSeparator();
     const normalizedPath = path.replace(/[\/\\]/g, separator);
-    
+
     // 경로 끝에 구분자가 없는 경우 추가
     return normalizedPath.endsWith(separator) ? normalizedPath : normalizedPath + separator;
 }
 
-// 파일명에서 경로 제거 함수
+/**
+ * 주어진 경로에서 파일명만 추출합니다.
+ *
+ * @param path 전체 파일 경로
+ * @return 파일명 문자열
+ */
 function getFileNameFromPath(path) {
     const separator = getOSPathSeparator();
     const parts = path.split(/[\/\\]/);
     return parts[parts.length - 1];
 }
 
+/**
+ * 텍스트 파일을 다운로드합니다.
+ *
+ * @param content 저장할 텍스트 내용
+ * @param defaultFilename 기본 파일명
+ */
 function downloadTextFile(content, defaultFilename) {
     const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
-    let filename = settings.useCustomFilename && settings.customFilename 
-        ? settings.customFilename 
+    let filename = settings.useCustomFilename && settings.customFilename
+        ? settings.customFilename
         : defaultFilename;
-    
+
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
-    
+
     // 다운로드 시작
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     // 저장 성공 메시지 표시
     alert(getTranslatedMessage("saveSuccess"));
 }
 
-// 설정 저장 함수 수정
+/**
+ * 설정 화면에서 입력한 값을 로컬 스토리지에 저장하고 적용합니다.
+ */
 function saveSettings() {
     const settings = {
         darkMode: document.getElementById("darkModeToggle").checked,
@@ -288,12 +318,16 @@ function saveSettings() {
         siteLanguage: document.getElementById("siteLanguage").value,
         enhancedOcrMode: document.getElementById("enhancedOcrMode").checked
     };
-    
+
     localStorage.setItem("appSettings", JSON.stringify(settings));
     applySettings(settings);
 }
 
-// 설정 적용 함수 수정
+/**
+ * 주어진 설정 객체를 바탕으로 화면과 기능에 설정을 적용합니다.
+ *
+ * @param settings 적용할 설정 객체
+ */
 function applySettings(settings) {
     // 다크모드 적용
     if (settings.darkMode) {
@@ -346,7 +380,9 @@ function applySettings(settings) {
     }
 }
 
-// 다크모드 토글
+/**
+ * 다크모드 설정을 토글하여 화면에 적용합니다.
+ */
 function toggleDarkMode() {
     const isDarkMode = document.getElementById("darkModeToggle").checked;
     if (isDarkMode) {
@@ -356,7 +392,9 @@ function toggleDarkMode() {
     }
 }
 
-// OCR 언어 업데이트
+/**
+ * 기본 OCR 언어를 업데이트하고 선택된 언어 태그를 갱신합니다.
+ */
 function updateDefaultOcrLang() {
     const lang = document.getElementById("defaultLang").value;
     selectedOcrLangs.clear();
@@ -364,12 +402,14 @@ function updateDefaultOcrLang() {
     updateSelectedLangTags();
 }
 
-// 선택된 언어 태그 업데이트
+/**
+ * 선택된 OCR 언어 태그 UI를 갱신합니다.
+ */
 function updateSelectedLangTags() {
     const container = document.getElementById("selectedLangTags");
     container.innerHTML = "";
     const currentLang = getCurrentLanguage();
-    
+
     selectedOcrLangs.forEach(code => {
         const langKey = getLangKeyFromCode(code);
         const tag = document.createElement("span");
@@ -380,7 +420,9 @@ function updateSelectedLangTags() {
     });
 }
 
-// OCR 언어 추가
+/**
+ * OCR 언어 드롭다운에서 선택한 언어를 추가합니다.
+ */
 function addOcrLang() {
     const dropdown = document.getElementById("ocrLangDropdown");
     const langCode = dropdown.value;
@@ -392,7 +434,11 @@ function addOcrLang() {
     updateSelectedLangTags();
 }
 
-// OCR 언어 제거
+/**
+ * 선택된 OCR 언어 태그에서 해당 언어를 제거합니다.
+ *
+ * @param code 제거할 언어 코드
+ */
 function removeOcrLang(code) {
     selectedOcrLangs.delete(code);
     updateSelectedLangTags();
@@ -400,6 +446,9 @@ function removeOcrLang(code) {
 
 // ... (기존 OCR, 번역, TTS 관련 함수들은 그대로 유지) ...
 
+/**
+ * 번역 대상 언어 드롭다운을 초기화합니다.
+ */
 function initTargetLangDropdown() {
     const select = document.getElementById("targetLang");
     const options = [
@@ -415,7 +464,7 @@ function initTargetLangDropdown() {
         { code: "vi", label: "langVie" },
         { code: "th", label: "langTha" }
     ];
-    
+
     select.innerHTML = '';
     options.forEach(opt => {
         const o = document.createElement("option");
@@ -427,6 +476,11 @@ function initTargetLangDropdown() {
     });
 }
 
+/**
+ * OCR 결과 텍스트를 선택된 언어로 번역합니다.
+ *
+ * @return 없음 (번역 결과는 전역 변수 및 UI에 반영)
+ */
 async function translateText() {
     const targetLang = document.getElementById("targetLang").value;
     const originalText = document.getElementById("ocrResult").innerText;
@@ -441,6 +495,11 @@ async function translateText() {
     document.getElementById("translationResult").innerText = translatedText;
 }
 
+/**
+ * 번역된 텍스트로 TTS 오디오를 생성합니다.
+ *
+ * @return 없음 (생성된 오디오는 오디오 플레이어에 반영)
+ */
 async function generateTTS() {
     const res = await fetch(`${BASE_URL}/api/tts`, {
         method: "POST",
@@ -452,18 +511,27 @@ async function generateTTS() {
     document.getElementById("audioPlayer").src = audioUrl;
 }
 
+/**
+ * OCR 결과 텍스트를 파일로 저장합니다.
+ */
 function saveOCRResult() {
     const text = document.getElementById("ocrResult")?.innerText || "";
     if (!text.trim()) return alert("OCR 결과가 비어 있습니다.");
     downloadTextFile(text, "ocr_result.txt");
 }
 
+/**
+ * 번역 결과 텍스트를 파일로 저장합니다.
+ */
 function saveTranslationResult() {
     const text = document.getElementById("translationResult")?.innerText || "";
     if (!text.trim()) return alert("번역 결과가 비어 있습니다.");
     downloadTextFile(text, "translation_result.txt");
 }
 
+/**
+ * 번역 결과 텍스트를 클립보드에 복사합니다.
+ */
 function copyTranslation() {
     const text = document.getElementById("translationResult")?.innerText || "";
     if (!text.trim()) {
@@ -475,6 +543,9 @@ function copyTranslation() {
         .catch(() => alert(getTranslatedMessage("copyFail")));
 }
 
+/**
+ * OCR 결과 텍스트를 클립보드에 복사합니다.
+ */
 function copyOCRResult() {
     const text = document.getElementById("ocrResult")?.innerText || "";
     if (!text.trim()) {
@@ -486,6 +557,12 @@ function copyOCRResult() {
         .catch(() => alert(getTranslatedMessage("copyFail")));
 }
 
+/**
+ * 번역 언어 코드에 맞는 TTS 언어 코드를 반환합니다.
+ *
+ * @param target 번역 언어 코드
+ * @return TTS 언어 코드
+ */
 function getTTSLang(target) {
     const map = {
         ko: "ko-KR", en: "en-US", ja: "ja-JP", zh: "zh-CN",
@@ -495,7 +572,11 @@ function getTTSLang(target) {
     return map[target] || "en-US";
 }
 
-// 📸 캡처 및 영역 캡처 함수 생략 안 함
+/**
+ * 화면 전체를 캡처하여 이미지 업로드 및 OCR 처리를 수행합니다.
+ *
+ * @return 없음 (OCR 결과는 UI에 반영)
+ */
 async function captureAndSend() {
     const lang = Array.from(selectedOcrLangs).join("+");
     const canvas = await html2canvas(document.body);
@@ -515,6 +596,9 @@ async function captureAndSend() {
     });
 }
 
+/**
+ * 사용자가 지정한 화면 영역을 캡처할 수 있도록 오버레이를 띄워줍니다.
+ */
 function startAreaCapture() {
     // 기존 오버레이가 있다면 제거
     const existingOverlay = document.getElementById("captureOverlay");
@@ -553,7 +637,7 @@ function startAreaCapture() {
 
         const onMouseMove = e => {
             if (!isCapturing) return;
-            
+
             const width = e.clientX - startX;
             const height = e.clientY - startY;
             box.style.width = `${Math.abs(width)}px`;
@@ -565,7 +649,7 @@ function startAreaCapture() {
         const onMouseUp = async () => {
             if (!isCapturing) return;
             isCapturing = false;
-            
+
             const rect = box.getBoundingClientRect();
             if (rect.width < 10 || rect.height < 10) {
                 overlay.remove();
@@ -598,9 +682,15 @@ function startAreaCapture() {
     document.addEventListener("keydown", onKeyDown);
 }
 
+/**
+ * 지정된 사각형 영역(rect)을 캡처하여 이미지 업로드 및 OCR 처리를 수행합니다.
+ *
+ * @param rect 캡처할 화면 영역의 getBoundingClientRect 객체
+ * @return Promise<void>
+ */
 async function captureRegion(rect) {
     const lang = Array.from(selectedOcrLangs).join("+");
-    
+
     try {
         const canvas = await html2canvas(document.body, {
             logging: false,
@@ -613,7 +703,7 @@ async function captureRegion(rect) {
         const dpr = window.devicePixelRatio || 1;
         cropped.width = rect.width * dpr;
         cropped.height = rect.height * dpr;
-        
+
         const ctx = cropped.getContext("2d");
         ctx.scale(dpr, dpr);
         ctx.drawImage(
@@ -662,7 +752,11 @@ async function captureRegion(rect) {
     }
 }
 
-// OCR 실행 함수 수정
+/**
+ * 업로드된 이미지를 서버로 전송하여 OCR을 수행합니다.
+ *
+ * @return 없음 (OCR 결과 및 통계는 UI에 반영)
+ */
 async function performOCR() {
     if (!imagePath) {
         alert(getTranslatedMessage("noFileSelected"));
@@ -671,15 +765,15 @@ async function performOCR() {
 
     const lang = Array.from(selectedOcrLangs).join("+");
     const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
-    
+
     try {
         document.getElementById("ocrResult").innerText = getTranslatedMessage("ocrProcessing");
-        
+
         const res = await fetch(`${BASE_URL}/api/ocr`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                imagePath, 
+            body: JSON.stringify({
+                imagePath,
                 lang,
                 enhancedMode: settings.enhancedOcrMode
             })
@@ -692,17 +786,17 @@ async function performOCR() {
 
         const result = await res.json();
         document.getElementById("ocrResult").innerText = result.lines.join("\n");
-        
+
         // 줄 수와 단어 수 계산
         const lineCount = result.lines.length;
         const wordCount = result.lines.reduce((count, line) => count + line.split(/\s+/).filter(word => word.length > 0).length, 0);
-        
+
         // 번역된 통계 메시지 표시
         const statsText = [
             getTranslatedMessage("totalLines", { count: lineCount }),
             getTranslatedMessage("totalWords", { count: wordCount })
         ].join("\n");
-        
+
         document.getElementById("ocrStats").innerText = statsText;
         document.getElementById("uploadResult").textContent = getTranslatedMessage("ocrSuccess");
     } catch (error) {
@@ -711,7 +805,11 @@ async function performOCR() {
     }
 }
 
-// 이미지 업로드 함수 수정
+/**
+ * 사용자가 선택한 이미지를 서버에 업로드합니다.
+ *
+ * @return 없음 (업로드 결과 및 미리보기는 UI에 반영)
+ */
 async function uploadImage() {
     const fileInput = document.getElementById("imageInput");
     const file = fileInput.files[0];
@@ -728,14 +826,14 @@ async function uploadImage() {
             method: "POST",
             body: formData
         });
-        
+
         if (!res.ok) {
             throw new Error("업로드 실패");
         }
 
         imagePath = await res.text();
         document.getElementById("uploadResult").textContent = getTranslatedMessage("uploadSuccess");
-        
+
         const preview = document.getElementById("imagePreview");
         preview.src = URL.createObjectURL(file);
         preview.style.display = "block";
@@ -745,12 +843,14 @@ async function uploadImage() {
     }
 }
 
-// 파일명 직접 입력 토글
+/**
+ * 파일명 직접 입력 체크박스 토글 시 입력 필드 표시를 제어합니다.
+ */
 function toggleCustomFilename() {
     const checkbox = document.getElementById("customFilename");
     const input = document.getElementById("filenameInput");
     input.style.display = checkbox.checked ? "block" : "none";
-    
+
     // 파일명 입력 필드에 현재 파일명 표시
     if (checkbox.checked) {
         const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
@@ -758,16 +858,18 @@ function toggleCustomFilename() {
     }
 }
 
-// 사이트 언어 변경
+/**
+ * 사이트 언어를 변경하고 화면의 모든 번역 가능한 텍스트를 갱신합니다.
+ */
 function changeSiteLanguage() {
     const lang = document.getElementById("siteLanguage").value;
     const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
     settings.siteLanguage = lang;
     localStorage.setItem("appSettings", JSON.stringify(settings));
-    
+
     // 페이지 새로고침 없이 언어 변경 적용
     const currentTranslations = translations[lang] || translations['ko'];
-    
+
     // 모든 버튼, 라벨, 제목, 옵션의 텍스트 업데이트
     document.querySelectorAll('[data-translate]').forEach(element => {
         const key = element.getAttribute('data-translate');
@@ -792,31 +894,46 @@ function changeSiteLanguage() {
 
     // 번역 언어 드롭다운 업데이트
     initTargetLangDropdown();
-    
+
     // OCR 언어 태그 업데이트
     updateSelectedLangTags();
 }
 
-// 현재 언어 가져오기
+/**
+ * 현재 설정된 사이트 언어 코드를 반환합니다.
+ *
+ * @return 언어 코드 문자열
+ */
 function getCurrentLanguage() {
     const settings = JSON.parse(localStorage.getItem("appSettings")) || defaultSettings;
     return settings.siteLanguage;
 }
 
-// 번역된 메시지 가져오기
+/**
+ * 현재 언어에 맞는 번역 메시지를 반환합니다.
+ *
+ * @param key 번역 메시지 키
+ * @param params 메시지 내 파라미터({count} 등) 치환용 객체
+ * @return 번역된 메시지 문자열
+ */
 function getTranslatedMessage(key, params = {}) {
     const lang = getCurrentLanguage();
     let message = translations[lang][key] || translations['ko'][key];
-    
+
     // 파라미터 치환
     Object.keys(params).forEach(param => {
         message = message.replace(`{${param}}`, params[param]);
     });
-    
+
     return message;
 }
 
-// 언어 코드를 번역 키로 변환
+/**
+ * OCR/번역 언어 코드에서 번역 테이블 키로 변환합니다.
+ *
+ * @param code 언어 코드
+ * @return 번역 키 문자열
+ */
 function getLangKeyFromCode(code) {
     const codeToKey = {
         'kor': 'langKor',
@@ -834,7 +951,12 @@ function getLangKeyFromCode(code) {
     return codeToKey[code] || 'langEng';
 }
 
-// 이미지 전처리 함수
+/**
+ * 이미지 캔버스를 전처리(이진화 등)하여 반환합니다.
+ *
+ * @param canvas 이미지 캔버스 객체
+ * @return 전처리된 캔버스 객체
+ */
 async function preprocessImage(canvas) {
     const ctx = canvas.getContext('2d');
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -852,7 +974,12 @@ async function preprocessImage(canvas) {
     return canvas;
 }
 
-// 이미지 해상도 향상 함수
+/**
+ * 이미지 캔버스의 해상도를 2배로 향상시켜 반환합니다.
+ *
+ * @param canvas 이미지 캔버스 객체
+ * @return 해상도 향상된 새 캔버스 객체
+ */
 async function enhanceResolution(canvas) {
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');

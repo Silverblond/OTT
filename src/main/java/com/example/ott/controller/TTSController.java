@@ -19,6 +19,12 @@ public class TTSController {
 
     private final TTSService ttsService;
 
+    /**
+     * 텍스트를 음성으로 변환하여 audio/mpeg 형식으로 반환하는 엔드포인트
+     *
+     * @param requestDto 텍스트와 언어 코드가 포함된 요청 DTO
+     * @return 변환된 음성 데이터 (MP3)와 함께 200 OK 응답 반환
+     */
     @PostMapping(produces = "audio/mpeg")
     public ResponseEntity<byte[]> convertToSpeech(@RequestBody TTSRequestDto requestDto) {
         byte[] audio = ttsService.generateSpeech(requestDto.getText(), requestDto.getLanguageCode());

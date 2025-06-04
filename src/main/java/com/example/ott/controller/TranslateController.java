@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 번역 요청을 처리하는 컨트롤러
+ *
+ * 클라이언트로부터 원문과 대상 언어를 받아 번역된 결과를 반환한다.
+ * 엔드포인트: POST /api/translate
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/translate")

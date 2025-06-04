@@ -7,117 +7,122 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-<div id="mainScreen">
-    <h1 data-translate="mainTitle">📄 OCR 번역 TTS 시스템</h1>
-    <button id="startBtn" data-translate="start">시작하기</button>
-    <button onclick="showScreen('settingsScreen')" data-translate="settings">⚙️ 설정</button>
-</div>
-
-<div id="ocrScreen" style="display: none;">
-    <h2 data-translate="imageUpload">1. 이미지 업로드</h2>
-    <div class="file-input-container">
-        <input type="file" id="imageInput" accept="image/*" style="display: none;" />
-        <button type="button" onclick="document.getElementById('imageInput').click()" data-translate="selectFile">파일 선택</button>
-        <span id="selectedFileName" data-translate="noFileSelected">선택된 파일 없음</span>
+    <!-- 📄 메인 화면 -->
+    <div id="mainScreen">
+        <h1 data-translate="mainTitle">📄 OCR 번역 TTS 시스템</h1>
+        <button id="startBtn" data-translate="start">시작하기</button>
+        <button onclick="showScreen('settingsScreen')" data-translate="settings">⚙️ 설정</button>
     </div>
-    <button onclick="uploadImage()" data-translate="upload">업로드</button>
-    <p id="uploadResult"></p>
 
-    <img id="imagePreview" style="max-width: 100%; margin-top: 10px; display: none;" />
-
-    <h2 data-translate="ocrLangSelect">2. OCR 언어 선택</h2>
-    <div>
-        <select id="ocrLangDropdown">
-            <option value="eng" data-translate="langEng">English</option>
-            <option value="kor" data-translate="langKor">한국어</option>
-            <option value="jpn" data-translate="langJpn">日本語</option>
-            <option value="chi_sim" data-translate="langChiSim">中文 (간체)</option>
-            <option value="rus" data-translate="langRus">Русский</option>
-            <option value="deu" data-translate="langDeu">Deutsch</option>
-            <option value="fra" data-translate="langFra">Français</option>
-            <option value="spa" data-translate="langSpa">Español</option>
-        </select>
-        <button onclick="addOcrLang()" data-translate="add">추가</button>
-    </div>
-    <div id="selectedLangTags" class="tag-container"></div>
-
-    <button onclick="performOCR()" data-translate="startOcr">OCR 시작</button>
-
-    <h2 data-translate="capture">3. 캡처</h2>
-    <button id="screenshotBtn" data-translate="capture">📸 전체 화면 캡처</button>
-    <button id="areaCaptureBtn" data-translate="areaCapture">📐 영역 지정 캡처</button>
-    <p><span id="screenshotStatus"></span> <span id="areaCaptureStatus"></span></p>
-
-    <button onclick="showScreen('resultScreen')" data-translate="viewResult">👉 결과 보기</button>
-    <button onclick="showScreen('settingsScreen')" data-translate="settings">⚙️ 설정</button>
-</div>
-
-<div id="resultScreen" style="display: none;">
-    <h2 data-translate="ocrResult">📝 OCR 결과</h2>
-    <pre id="ocrResult"></pre>
-    <button onclick="copyOCRResult()" data-translate="copyOcr">📋 OCR 복사</button>
-    <p id="ocrStats"></p>
-    <button onclick="saveOCRResult()" data-translate="saveOcr">📝 OCR 결과 저장</button>
-
-    <h2 data-translate="translation">🌐 번역</h2>
-    <label for="targetLang" data-translate="selectTargetLang">번역할 언어 선택:</label>
-    <select id="targetLang"></select>
-    <button onclick="translateText()" data-translate="startTranslation">번역 시작</button>
-    <pre id="translationResult"></pre>
-    <button onclick="saveTranslationResult()" data-translate="saveTranslation">🌐 번역 결과 저장</button>
-    <button onclick="copyTranslation()" data-translate="copyTranslation">📋 번역 복사</button>
-
-    <h2 data-translate="tts">🔊 TTS</h2>
-    <button onclick="generateTTS()" data-translate="runTts">TTS 실행</button>
-    <audio id="audioPlayer" controls></audio>
-
-    <button onclick="showScreen('ocrScreen')" data-translate="backToOcr">← 다시 OCR 화면</button>
-    <button onclick="showScreen('settingsScreen')" data-translate="settings">⚙️ 설정</button>
-</div>
-
-<div id="settingsScreen" style="display: none;">
-    <h2 data-translate="settings">⚙️ 설정</h2>
-    <div class="settings-container">
-        <div class="setting-item">
-            <label for="darkModeToggle" data-translate="darkMode">다크 모드:</label>
-            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
+    <!-- 🖼 OCR 화면 -->
+    <div id="ocrScreen" style="display: none;">
+        <h2 data-translate="imageUpload">1. 이미지 업로드</h2>
+        <div class="file-input-container">
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" />
+            <button type="button" onclick="document.getElementById('imageInput').click()" data-translate="selectFile">파일 선택</button>
+            <span id="selectedFileName" data-translate="noFileSelected">선택된 파일 없음</span>
         </div>
+        <button onclick="uploadImage()" data-translate="upload">업로드</button>
+        <p id="uploadResult"></p>
 
-        <div class="setting-item">
-            <label for="defaultLang" data-translate="defaultOcrLang">기본 OCR 언어 설정:</label>
-            <select id="defaultLang" onchange="updateDefaultOcrLang()">
+        <img id="imagePreview" style="max-width: 100%; margin-top: 10px; display: none;" />
+
+        <h2 data-translate="ocrLangSelect">2. OCR 언어 선택</h2>
+        <div>
+            <select id="ocrLangDropdown">
+                <option value="eng" data-translate="langEng">English</option>
                 <option value="kor" data-translate="langKor">한국어</option>
-                <option value="eng" data-translate="langEng">영어</option>
-                <option value="jpn" data-translate="langJpn">일본어</option>
-                <option value="chi_sim" data-translate="langChiSim">중국어 간체</option>
+                <option value="jpn" data-translate="langJpn">日本語</option>
+                <option value="chi_sim" data-translate="langChiSim">中文 (간체)</option>
+                <option value="rus" data-translate="langRus">Русский</option>
+                <option value="deu" data-translate="langDeu">Deutsch</option>
+                <option value="fra" data-translate="langFra">Français</option>
+                <option value="spa" data-translate="langSpa">Español</option>
             </select>
+            <button onclick="addOcrLang()" data-translate="add">추가</button>
         </div>
+        <div id="selectedLangTags" class="tag-container"></div>
 
-        <div class="setting-item">
-            <label for="enhancedOcrMode" data-translate="enhancedOcrMode">OCR 정확도 향상 모드:</label>
-            <input type="checkbox" id="enhancedOcrMode" />
-            <div class="setting-description" data-translate="enhancedOcrModeDesc">이미지 전처리 및 해상도 향상을 통해 OCR 정확도를 개선합니다.</div>
-        </div>
+        <button onclick="performOCR()" data-translate="startOcr">OCR 시작</button>
 
-        <div class="setting-item">
-            <label for="customFilename" data-translate="customFilename">파일명 직접 입력:</label>
-            <input type="checkbox" id="customFilename" onchange="toggleCustomFilename()" />
-            <input type="text" id="filenameInput" placeholder="파일명 입력" style="display: none;" />
-        </div>
+        <h2 data-translate="capture">3. 캡처</h2>
+        <button id="screenshotBtn" data-translate="capture">📸 전체 화면 캡처</button>
+        <button id="areaCaptureBtn" data-translate="areaCapture">📐 영역 지정 캡처</button>
+        <p><span id="screenshotStatus"></span> <span id="areaCaptureStatus"></span></p>
 
-        <div class="setting-item">
-            <label for="siteLanguage" data-translate="siteLanguage">사이트 언어:</label>
-            <select id="siteLanguage" onchange="changeSiteLanguage()">
-                <option value="ko" data-translate="langKor">한국어</option>
-                <option value="en" data-translate="langEng">English</option>
-            </select>
-        </div>
-
-        <button onclick="saveSettings()" data-translate="applySettings">설정 저장</button>
-        <button data-translate="backToPrevious">이전 화면으로</button>
+        <button onclick="showScreen('resultScreen')" data-translate="viewResult">👉 결과 보기</button>
+        <button onclick="showScreen('settingsScreen')" data-translate="settings">⚙️ 설정</button>
     </div>
-</div>
 
-<script src="/js/main.js" defer></script>
+    <!-- 📋 결과 화면 -->
+    <div id="resultScreen" style="display: none;">
+        <h2 data-translate="ocrResult">📝 OCR 결과</h2>
+        <pre id="ocrResult"></pre>
+        <button onclick="copyOCRResult()" data-translate="copyOcr">📋 OCR 복사</button>
+        <p id="ocrStats"></p>
+        <button onclick="saveOCRResult()" data-translate="saveOcr">📝 OCR 결과 저장</button>
+
+        <h2 data-translate="translation">🌐 번역</h2>
+        <label for="targetLang" data-translate="selectTargetLang">번역할 언어 선택:</label>
+        <select id="targetLang"></select>
+        <button onclick="translateText()" data-translate="startTranslation">번역 시작</button>
+        <pre id="translationResult"></pre>
+        <button onclick="saveTranslationResult()" data-translate="saveTranslation">🌐 번역 결과 저장</button>
+        <button onclick="copyTranslation()" data-translate="copyTranslation">📋 번역 복사</button>
+
+        <h2 data-translate="tts">🔊 TTS</h2>
+        <button onclick="generateTTS()" data-translate="runTts">TTS 실행</button>
+        <audio id="audioPlayer" controls></audio>
+
+        <button onclick="showScreen('ocrScreen')" data-translate="backToOcr">← 다시 OCR 화면</button>
+        <button onclick="showScreen('settingsScreen')" data-translate="settings">⚙️ 설정</button>
+    </div>
+
+    <!-- ⚙️ 설정 화면 -->
+    <div id="settingsScreen" style="display: none;">
+        <h2 data-translate="settings">⚙️ 설정</h2>
+        <div class="settings-container">
+            <div class="setting-item">
+                <label for="darkModeToggle" data-translate="darkMode">다크 모드:</label>
+                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
+            </div>
+
+            <div class="setting-item">
+                <label for="defaultLang" data-translate="defaultOcrLang">기본 OCR 언어 설정:</label>
+                <select id="defaultLang" onchange="updateDefaultOcrLang()">
+                    <option value="kor" data-translate="langKor">한국어</option>
+                    <option value="eng" data-translate="langEng">영어</option>
+                    <option value="jpn" data-translate="langJpn">일본어</option>
+                    <option value="chi_sim" data-translate="langChiSim">중국어 간체</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <label for="enhancedOcrMode" data-translate="enhancedOcrMode">OCR 정확도 향상 모드:</label>
+                <input type="checkbox" id="enhancedOcrMode" />
+                <div class="setting-description" data-translate="enhancedOcrModeDesc">이미지 전처리 및 해상도 향상을 통해 OCR 정확도를 개선합니다.</div>
+            </div>
+
+            <div class="setting-item">
+                <label for="customFilename" data-translate="customFilename">파일명 직접 입력:</label>
+                <input type="checkbox" id="customFilename" onchange="toggleCustomFilename()" />
+                <input type="text" id="filenameInput" placeholder="파일명 입력" style="display: none;" />
+            </div>
+
+            <div class="setting-item">
+                <label for="siteLanguage" data-translate="siteLanguage">사이트 언어:</label>
+                <select id="siteLanguage" onchange="changeSiteLanguage()">
+                    <option value="ko" data-translate="langKor">한국어</option>
+                    <option value="en" data-translate="langEng">English</option>
+                </select>
+            </div>
+
+            <button onclick="saveSettings()" data-translate="applySettings">설정 저장</button>
+            <button data-translate="backToPrevious">이전 화면으로</button>
+        </div>
+    </div>
+
+    <!-- 📜 스크립트 로딩 -->
+    <script src="/js/main.js" defer></script>
 </body>
 </html>
