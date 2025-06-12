@@ -3,7 +3,7 @@
 let imagePath = "";
 let translatedText = "";
 let languageCode = "en-US";
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://3.34.97.31:8080";
 let selectedOcrLangs = new Set();
 let previousScreen = "mainScreen"; // 이전 화면을 추적하는 변수 추가
 
