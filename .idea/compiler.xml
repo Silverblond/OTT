@@ -6,7 +6,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/3.3.13-SNAPSHOT/8784c30f6afe81627ec586f4d63f40155dafe8bb/spring-boot-configuration-processor-3.3.13-SNAPSHOT.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/3.3.13-SNAPSHOT/281554826fedd3f2743c32b896fdc44b8b8f05d6/spring-boot-configuration-processor-3.3.13-SNAPSHOT.jar" />
         </processorPath>
         <module name="ott.main" />
       </profile>
