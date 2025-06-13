@@ -29,9 +29,20 @@ OCR, Translate and TTS
 - [AdoptOpenJDK](https://adoptium.net/) 또는 [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) 에서 Java 17 설치
 - 설치 후 `JAVA_HOME` 환경변수 설정 필요
 
-#### 2️⃣ Git 설치
+#### 2️⃣ Git 설치 및 Chocolatey 설치
 
 - [Git 공식 다운로드](https://git-scm.com/download/win)에서 설치
+
+powershell을 관리자 권한으로 실행
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+설치 확인:
+```powershell
+choco
+```
+버전이 나온다면 정상설치 완료
 
 #### 3️⃣ Tesseract 설치
 
@@ -49,6 +60,8 @@ choco install tesseract
 C:\Program Files\Tesseract-OCR\tessdata\kor.traineddata
 ```
 없으면 https://github.com/tesseract-ocr/tessdata에 직접 다운로드 후 tessdata 폴더에 넣기
+
+---
 
 ### 🍏 macOS 설치 방법
 
@@ -103,6 +116,8 @@ brew install tesseract
 ```bash
 brew install tesseract-lang
 ```
+
+---
 
 ### 🐧 Ubuntu 설치 방법
 
@@ -167,6 +182,8 @@ TESSDATA_PREFIX=C:\Program Files\Tesseract-OCR\tessdata
 TESSDATA_PREFIX=/opt/homebrew/share/tessdata
 TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 ```
+
+Google API 키는 발급한 키를 과제 제출시 따로 제출하겠습니다.
 
 #### 3️⃣ 홈페이지 연결
 http://localhost:8080으로 접속
