@@ -27,7 +27,6 @@ OCR, Translate and TTS
 #### 1️⃣ Java 17 설치
 
 - [AdoptOpenJDK](https://adoptium.net/) 또는 [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) 에서 Java 17 설치
-- 설치 후 `JAVA_HOME` 환경변수 설정 필요
 
 #### 2️⃣ Git 설치 및 Chocolatey 설치
 
@@ -53,13 +52,31 @@ choco install tesseract
 ```
 또는 https://github.com/tesseract-ocr/tessdoc 다운로드 후 설치
 
+```powershell
+# 영어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\eng.traineddata"
+# 한국어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/kor.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\kor.traineddata"
+# 일본어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/jpn.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\jpn.traineddata"
+# 중국어 간체
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/chi_sim.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\chi_sim.traineddata"
+# 러시아어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/rus.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\rus.traineddata"
+# 독일어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/deu.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\deu.traineddata"
+# 프랑스어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/fra.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\fra.traineddata"
+# 스페인어
+Invoke-WebRequest -Uri "https://github.com/tesseract-ocr/tessdata/raw/main/spa.traineddata" -OutFile "C:\Program Files\Tesseract-OCR\tessdata\spa.traineddata"
+```
 #### 4️⃣ kor.traineddata 설치 확인
 
 ```powershell
 # kor.traineddata 파일이 아래 경로에 존재하는지 확인
 C:\Program Files\Tesseract-OCR\tessdata\kor.traineddata
 ```
-없으면 https://github.com/tesseract-ocr/tessdata에 직접 다운로드 후 tessdata 폴더에 넣기
+없으면 https://github.com/tesseract-ocr/tessdata 에 직접 다운로드 후 tessdata 폴더에 넣기
 
 ---
 
@@ -164,7 +181,7 @@ sudo apt install -y tesseract-ocr
 #### 45️⃣ Tesseract 언어 데이터 설치 (한국어 포함)
 
 ```bash
-sudo apt install -y tesseract-ocr-kor
+sudo apt install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-kor tesseract-ocr-jpn tesseract-ocr-chi-sim tesseract-ocr-rus tesseract-ocr-deu tesseract-ocr-fra tesseract-ocr-spa
 ```
 
 ### ⚙️ 프로젝트 실행 방법
