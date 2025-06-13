@@ -24,7 +24,7 @@ OCR, Translate and TTS
 
 ---
 
-### 🪟 Windows 설치 방법 (처음부터 단계별)
+### 🪟 Windows 설치 방법
 
 #### 1️⃣ Java 17 설치
 
@@ -41,7 +41,123 @@ Chocolatey 사용 (권장):
 
 ```powershell
 choco install tesseract
+```
+또는 https://github.com/tesseract-ocr/tessdoc 다운로드 후 설치
 
 #### 4️⃣ kor.traineddata 설치 확인
+
+```powershell
 # kor.traineddata 파일이 아래 경로에 존재하는지 확인
 C:\Program Files\Tesseract-OCR\tessdata\kor.traineddata
+```
+없으면 https://github.com/tesseract-ocr/tessdata에 직접 다운로드 후 tessdata 폴더에 넣기
+
+### 🍏 macOS 설치 방법
+
+#### 1️⃣ Homebrew 설치 (없다면)
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+설치 후 path 설정:
+```bash
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+#### 2️⃣ Java 17 설치
+
+```bash
+brew install openjdk@17
+```
+
+#### 3️⃣ Gradle 설치 (옵션)
+
+```bash
+brew install gradle
+```
+
+설정 확인:
+```bash
+gradle -v
+```
+
+#### 4️⃣ Git 설치
+
+```bash
+brew install git
+```
+
+설치 확인:
+```bash
+git --version
+```
+
+#### 5️⃣ Tesseract 설치
+
+```bash
+brew install tesseract
+```
+
+#### 6️⃣ Tesseract 언어 데이터 설치 (한국어 포함)
+
+```bash
+brew install tesseract-lang
+```
+
+### 🐧 Ubuntu 설치 방법
+
+#### 1️⃣ Java 17 설치
+
+```bash
+sudo apt update
+sudo apt install -y openjdk-17-jdk
+```
+
+설정 확인:
+```bash
+java -version
+```
+
+#### 2️⃣ Git 설치
+
+```bash
+sudo apt install -y git
+```
+
+설치 확인:
+```bash
+git --version
+```
+
+#### 3️⃣ Gradle 설치 (옵션)
+
+```bash
+sudo apt install -y gradle
+```
+
+설치 확인:
+```bash
+gradle -v
+```
+
+#### 4️⃣ Tesseract 설치
+
+```bash
+sudo apt install -y tesseract-ocr
+```
+
+### ⚙️ 프로젝트 실행 방법
+
+#### 1️⃣ 프로젝트 다운로드
+```bash
+git clone https://github.com/Silverblond/OTT.git
+cd OTT
+```
+
+#### 2️⃣ Backend 실행
+
+```bash
+./gradlew bootRun
+```
