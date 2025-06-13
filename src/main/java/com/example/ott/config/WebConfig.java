@@ -20,10 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
                 .allowedOrigins("http://localhost:63342",
-                        "http://3.34.97.31:8080",
-                        "https://3.34.97.31:8080",
-                        "http://ec2-3-34-97-31.ap-northeast-2.compute.amazonaws.com:8080",
-                        "https://ec2-3-34-97-31.ap-northeast-2.compute.amazonaws.com:8080")
+                        "http://localhost:8080")
+
+//                        "http://3.34.97.31:8080",
+//                        "https://3.34.97.31:8080",
+//                        "http://ec2-3-34-97-31.ap-northeast-2.compute.amazonaws.com:8080",
+//                        "https://ec2-3-34-97-31.ap-northeast-2.compute.amazonaws.com:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

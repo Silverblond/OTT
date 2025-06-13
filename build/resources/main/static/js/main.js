@@ -544,9 +544,15 @@ function copyTranslation() {
         alert(getTranslatedMessage("noTranslationResult"));
         return;
     }
-    navigator.clipboard.writeText(text)
-        .then(() => alert(getTranslatedMessage("copySuccess")))
-        .catch(() => alert(getTranslatedMessage("copyFail")));
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => alert(getTranslatedMessage("copySuccess")))
+            .catch(() => alert(getTranslatedMessage("copyFail")));
+    } else {
+        console.warn("Clipboard API is not supported or requires HTTPS.");
+        alert("클립보드 복사는 HTTPS에서만 지원됩니다.");
+    }
 }
 
 /**
@@ -558,9 +564,15 @@ function copyOCRResult() {
         alert(getTranslatedMessage("noOcrResult"));
         return;
     }
-    navigator.clipboard.writeText(text)
-        .then(() => alert(getTranslatedMessage("copySuccess")))
-        .catch(() => alert(getTranslatedMessage("copyFail")));
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => alert(getTranslatedMessage("copySuccess")))
+            .catch(() => alert(getTranslatedMessage("copyFail")));
+    } else {
+        // Fallback or warning
+        console.warn("Clipboard API is not supported or requires HTTPS.");
+        alert("클립보드 복사는 HTTPS에서만 지원됩니다.");
+    }
 }
 
 /**
