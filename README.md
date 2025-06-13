@@ -161,6 +161,12 @@ gradle -v
 sudo apt install -y tesseract-ocr
 ```
 
+#### 45️⃣ Tesseract 언어 데이터 설치 (한국어 포함)
+
+```bash
+sudo apt install -y tesseract-ocr-kor
+```
+
 ### ⚙️ 프로젝트 실행 방법
 
 #### 1️⃣ 프로젝트 다운로드
