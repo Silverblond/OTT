@@ -194,16 +194,29 @@ cd OTT
 
 #### 2️⃣ Backend 실행
 
+mac/ubuntu일 경우:
 ```bash
 GOOGLE_API_KEY=<API KEY> TESSDATA_PREFIX=<tessdata path> ./gradlew bootRun
 ```
 환경 변수 파일을 생성하고 export로 설정하시고 하셔도됩니다.
 
-tessdata 윈도우/mac/ubuntu(일반적 경로 기준)
+tessdata 경로:
 ```bash
 TESSDATA_PREFIX=C:\Program Files\Tesseract-OCR\tessdata
 TESSDATA_PREFIX=/opt/homebrew/share/tessdata
 TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+```
+
+❗윈도우는 다름:
+```powershell
+$env:GOOGLE_API_KEY = "API KEY"
+$env:TESSDATA_PREFIX = "path"
+```
+환경 변수를 지정하고 시작해야한다. 해당 환경 변수는 해당 세션동안만 임시로 지정되는 환경변수이다.
+
+그리고 이후 해당 명령어로 실행.
+```powershell
+./gradlew bootRun
 ```
 
 Google API 키는 발급한 키를 과제 제출시 따로 제출하겠습니다.
