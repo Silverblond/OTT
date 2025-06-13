@@ -1,8 +1,6 @@
 # OTT
 OCR, Translate and TTS
 
-# OCR + 번역 서비스 프로젝트 (OTT)
-
 손글씨 및 이미지에서 텍스트를 추출(OCR)한 후 번역 결과를 제공하는 웹 서비스입니다.  
 **Spring Boot + Gradle + Tess4J + Tesseract OCR 엔진** 기반으로 구현되었습니다.
 
@@ -20,8 +18,8 @@ OCR, Translate and TTS
 
 ---
 
-## 📦 설치 방법 (Windows / macOS / Ubuntu 전부 포함)
-
+## 📦 설치 방법 (Windows / macOS / Ubuntu)
+    
 ---
 
 ### 🪟 Windows 설치 방법
@@ -159,5 +157,24 @@ cd OTT
 #### 2️⃣ Backend 실행
 
 ```bash
-./gradlew bootRun
+GOOGLE_API_KEY=<API KEY> TESSDATA_PREFIX=<tessdata path> ./gradlew bootRun
 ```
+환경 변수 파일을 생성하고 export로 설정하시고 하셔도됩니다.
+
+tessdata 윈도우/mac/ubuntu(일반적 경로 기준)
+```bash
+TESSDATA_PREFIX=C:\Program Files\Tesseract-OCR\tessdata
+TESSDATA_PREFIX=/opt/homebrew/share/tessdata
+TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+```
+
+#### 3️⃣ 홈페이지 연결
+http://localhost:8080으로 접속
+
+#### 4️⃣ 테스트 및 첨언
+- 기타 다른 사진으로 실험해보셔도 됩니다.
+- 일단 예시 사진은 image 폴더 안에 있으니 해보셔도됩니다.
+- 정확도가 높은 편은 아닙니다. 그리고 단점은 자동 언어 인식을 못하기 때문에, 복합적인 언어가 나오면 해당 언어를 추가하여 복수로 등록해줘야합니다.
+- 전체 화면 캡쳐는 해당 사이트 내의 전체 화면을 캡쳐합니다.
+- 부분 캡쳐는 해당 화면 내에서 부분을 캡쳐합니다. 하지만 정확도가 매우 낮고 인식율이 많이 좋지 않습니다.
+- TTS는 번역 설정 언어를 기반으로 하여 읽어줍니다.
